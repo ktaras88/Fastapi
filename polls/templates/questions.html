@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Polls</title>
+</head>
+<body>
+    {% for question in questions %}
+        <li>{{ question.question_text }}</li>
+    {% endfor %}
+</body>
+</html>

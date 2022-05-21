@@ -1,5 +1,8 @@
-from fastapi import Depends, FastAPI, HTTPException
+import typing
+from fastapi import Depends, FastAPI, HTTPException, Request
 from sqlalchemy.orm import Session
+from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse
 
 from . import crud, models, schemas
 from .database import SessionLocal, engine
@@ -8,8 +11,9 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
+templates = Jinja2Templates(directory="polls/templates")
 
-# Dependency
+
 def get_db():
     db = SessionLocal()
     try:
@@ -23,20 +27,23 @@ def create_question(question_schema: schemas.QuestionCreate, db: Session = Depen
     return crud.create_question(db=db, question_schema=question_schema)
 
 
-@app.get("/questions/", response_model=list[schemas.Question])
-def read_questions(limit: int = 5, db: Session = Depends(get_db)):
-    return crud.get_questions(db, limit=limit)
+@app.get("/questions/", response_model=typing.List[schemas.Question], response_class=HTMLResponse)
+def read_questions(request: Request, limit: int = 5, db: Session = Depends(get_db)):
+    questions = crud.get_questions(db, limit=limit)
+    return templates.TemplateResponse("questions.html", {'request': request, 'questions': questions})
 
 
 @app.post("/questions/{question_id}/choice/", response_model=schemas.Choice)
 def create_choice(question_id: int, choice: schemas.ChoiceCreate, db: Session = Depends(get_db)):
-    import pdb; pdb.set_trace()
     return crud.create_choice(db=db, choice=choice, question_id=question_id)
 
 
-@app.get("/questions/{question_id}", response_model=list[schemas.Choice])
-def read_choices(question_id: int, db: Session = Depends(get_db)):
-    return crud.get_choices(db, question_id=question_id)
+@app.get("/questions/{question_id}", response_model=typing.List[schemas.Choice], response_class=HTMLResponse)
+def read_choices(request: Request, question_id: int, db: Session = Depends(get_db)):
+    choices = crud.get_choices(db, question_id=question_id)
+    return templates.TemplateResponse("choices.html", {
+        'request': request, 'choices': choices, 'question_id': question_id
+    })
 
 
 @app.get("/questions/{question_id}/votes", response_model=list[schemas.Choice])
