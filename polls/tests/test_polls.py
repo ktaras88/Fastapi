@@ -8,6 +8,7 @@ from ..main import app, get_db
 # Base.metadata.drop_all(bind=engine)
 Base.metadata.create_all(bind=engine)
 
+
 def override_get_db():
     try:
         db = TestingSessionLocal()
