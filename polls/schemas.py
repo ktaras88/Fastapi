@@ -34,3 +34,7 @@ class Question(QuestionBase):
 
     class Config:
         orm_mode = True
+
+
+class Vote(BaseModel):
+    choice: int

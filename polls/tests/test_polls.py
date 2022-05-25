@@ -28,21 +28,21 @@ def test_read_questions(database_cleanup):
     assert response.context['questions'] == []
 
 
-def test_read_choices():
+def test_read_choices(database_cleanup):
     response = client.get('/questions/1')
     question_id = 1
     assert response.status_code == 200
     assert response.context['question_id'] == question_id
 
 
-def test_create_questions():
+def test_create_questions(database_cleanup):
     data = {'question_text': 'Question_1?'}
     response = client.post("/questions/", json=data)
     assert response.status_code == 200
     assert response.json()['question_text'] == data['question_text']
 
 
-def test_create_choice(question_id):
+def test_create_choice(database_cleanup, question_id):
     response = None
     for num in range(3):
         choice = f'test_choice_{num}'
@@ -50,3 +50,10 @@ def test_create_choice(question_id):
     count_of_choices = db.query(models.Choice).filter(models.Choice.question_id == question_id).count()
     assert response.status_code == 200
     assert count_of_choices == 3
+
+
+def test_make_vote(database_cleanup, question_id):
+    response = None
+    response = client.post(f'/questions/{question_id}/vote/', json={'choice_text': 'test_choice'})
+    # import pdb; pdb.set_trace()
+    assert response.status_code == 200

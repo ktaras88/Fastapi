@@ -46,6 +46,14 @@ def read_choices(request: Request, question_id: int, db: Session = Depends(get_d
     })
 
 
-@app.get("/questions/{question_id}/votes", response_model=list[schemas.Choice])
-def read_voting_results(question_id: int, db: Session = Depends(get_db)):
-    return crud.get_voting_results(db, question_id)
+@app.post("/questions/{question_id}/vote/", response_model=schemas.Vote)
+def make_vote(question_id: int, vote: schemas.Vote, db: Session = Depends(get_db)):
+    return crud.make_vote(db=db, question_id=question_id, vote=vote)
+
+
+@app.get("/questions/{question_id}/results", response_model=list[schemas.Choice], response_class=HTMLResponse)
+def read_voting_results(request: Request, question_id: int, db: Session = Depends(get_db)):
+    choices = crud.get_voting_results(db, question_id)
+    return templates.TemplateResponse("results.html", {
+        'request': request, 'choices': choices, 'question_id': question_id
+    })

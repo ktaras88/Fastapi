@@ -1,11 +1,11 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Polls</title>
-</head>
-<body>
+{% if questions %}
+    <ul>
     {% for question in questions %}
-        <li>{{ question.question_text }}</li>
+        <li><a href="/questions/{{ question.id }}">{{ question.question_text }}</a></li>
     {% endfor %}
-</body>
-</html>
+    </ul>
+{% else %}
+    <p>No polls are available.</p>
+{% endif %}
+
+

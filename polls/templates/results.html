@@ -1,0 +1,9 @@
+<h1>{{ question_id }}</h1>
+
+<ul>
+{% for choice in choices %}
+    <li>{{ choice.choice_text }} -- {{ choice.votes }} </li>
+{% endfor %}
+</ul>
+
+<a href="/questions/{{ question_id }}">Vote again?</a>
