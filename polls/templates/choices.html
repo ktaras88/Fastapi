@@ -1,6 +1,6 @@
 <h1>{{ question_id }}</h1>
 
-<form action="/questions/{{ question_id }}/vote/" method="post">
+<form action="/questions/{{ question_id }}/answer/" method="post">
 {% for choice in choices %}
     <input type="radio" name="choice" id="choice{{ choice.id }}" value="{{ choice.id }}">
     <label for="choice{{ choice.id }}">{{ choice.choice_text }}</label><br>

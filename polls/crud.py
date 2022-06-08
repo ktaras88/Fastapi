@@ -12,9 +12,18 @@ def get_choices(db: Session, question_id: int):
     return db.query(models.Choice).filter(models.Choice.question_id == question_id).all()
 
 
-def make_vote(db: Session, question_id: int, vote: schemas.Vote):
-    selected_choice = db.query(models.Choice).filter(models.Choice.question_id == question_id).get(models.Choice.id == vote.choice)
+def make_vote(db: Session, vote: schemas.Vote, question_id: int):
+    selected_choice = db.query(models.Choice).filter(models.Choice.question_id == question_id).\
+        filter(models.Choice.id == vote.choice).first()
+    selected_choice.votes += 1
+    db.add(selected_choice)
+    db.commit()
+    return selected_choice
 
+
+def make_answer(db: Session, choice: int, question_id: int):
+    selected_choice = db.query(models.Choice).filter(models.Choice.question_id == question_id).\
+        filter(models.Choice.id == choice).first()
     selected_choice.votes += 1
     db.add(selected_choice)
     db.commit()

@@ -1,5 +1,5 @@
 import typing
-from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, HTTPException, Request, Form
 from sqlalchemy.orm import Session
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
@@ -46,14 +46,15 @@ def read_choices(request: Request, question_id: int, db: Session = Depends(get_d
     })
 
 
-@app.post("/questions/{question_id}/vote/", response_model=schemas.Vote)
+@app.post("/questions/{question_id}/vote/")
 def make_vote(question_id: int, vote: schemas.Vote, db: Session = Depends(get_db)):
     return crud.make_vote(db=db, question_id=question_id, vote=vote)
 
 
-@app.get("/questions/{question_id}/results", response_model=list[schemas.Choice], response_class=HTMLResponse)
-def read_voting_results(request: Request, question_id: int, db: Session = Depends(get_db)):
+@app.post("/questions/{question_id}/answer/")
+def make_answer(request: Request, question_id: int, choice: int = Form(), db: Session = Depends(get_db)):
+    crud.make_answer(db=db, question_id=question_id, choice=choice)
     choices = crud.get_voting_results(db, question_id)
     return templates.TemplateResponse("results.html", {
-        'request': request, 'choices': choices, 'question_id': question_id
+        'request': request, 'question_id': question_id, 'choices': choices
     })

@@ -15,6 +15,7 @@ def question_id():
     response = client.post("/questions/", json=data)
     return response.json()['id']
 
+
 @pytest.fixture
 def database_cleanup():
     db = TestingSessionLocal()

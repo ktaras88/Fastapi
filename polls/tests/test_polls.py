@@ -53,7 +53,8 @@ def test_create_choice(database_cleanup, question_id):
 
 
 def test_make_vote(database_cleanup, question_id):
-    response = None
-    response = client.post(f'/questions/{question_id}/vote/', json={'choice_text': 'test_choice'})
-    # import pdb; pdb.set_trace()
+    choice_response = client.post(f'/questions/{question_id}/choice/', json={'choice_text': 'test_choice'})
+    choice_id = db.query(models.Choice).filter(models.Choice.question_id == question_id).\
+        filter(models.Choice.id == choice_response.json()['id']).first().id
+    response = client.post(f'/questions/{question_id}/vote/', json={'choice': choice_id})
     assert response.status_code == 200
